@@ -4,7 +4,7 @@ printfn "Hello from F#"
 type Tree<'a> =
     | Node of 'a * Tree<'a> list
 
-let moveTree (Node((label, x), subtrees) : Tree<string * float>) (x' : float) : Tree<string * float> =
+let moveTree (Node((label, x), subtrees) : Tree<'a * float>) (x' : float) : Tree<'a * float> =
     Node((label, x + x'), subtrees)
     
 type Extent = (float*float) list
@@ -20,14 +20,75 @@ let rec merge : Extent * Extent -> Extent = function
 let mergeList (es : Extent List) = List.fold (fun acc elem -> merge (acc, elem)) [] es
 
 
+let rmax (p : float) (q : float) : float =
+    if p > q then p else q
+
+
+let rec fit (ps : (float * float) list) (qs : (float * float) list) : float =
+    match (ps, qs) with
+    | ((_, p)::ps', (q, _)::qs') -> rmax (fit ps' qs')  (p - q + 1.0)
+    | _ -> 0.0
+
+
+let fitlistl (es : Extent list) =
+    let rec fitlistl' (acc : Extent) (es : Extent list) =
+        match es with
+        | [] -> []
+        | e::es' ->
+            let x = fit acc e
+            x :: fitlistl' (merge (acc, (moveExtent (e, x)))) es'
+    fitlistl' [] es
+
+let fitlistr (es : Extent list) =
+    let rec fitlistr' (acc : Extent) (es : Extent list) =
+        match es with
+        | [] -> []
+        | e::es' ->
+            let x = -(fit e acc)
+            in
+                x :: fitlistr' (merge ((moveExtent (e, x)), acc)) es'
+    in
+        List.rev (fitlistr' [] (List.rev es))
+
+let mean (x, y) = (x + y) / 2.0
+
+let fitlist es = List.map mean (List.zip (fitlistl es) (fitlistr es))
+
+let design tree =
+    let rec design' (Node(label, subtrees)) =
+        let trees, extents = List.unzip (List.map design' subtrees)
+        let positions = fitlist extents
+        let ptrees = List.map2 moveTree trees positions
+        let pextents = List.map moveExtent (List.zip extents positions)
+        let resultextent = (0.0, 0.0) :: mergeList pextents
+        let resulttree = Node((label, 0.0), ptrees)
+        (resulttree, resultextent)
+    fst (design' tree)
+
+
+let tree = Node((1, 0.0), [
+        Node((2, 0.0), []);
+        Node((3, 0.0), []);
+        Node((6, 0.0), []);
+    ])
+
+let tree2 = Node((1, 0.0), [
+        Node((2, 0.0), []);
+        Node((3, 0.0), [
+            Node((7, 0.0), []);
+            Node((8, 0.0), []);
+            Node((9, 0.0), []);
+        ]);
+        Node((6, 0.0), [
+            Node((7, 0.0), []);
+            Node((8, 0.0), []);
+            Node((9, 0.0), []);
+        ]);
+    ])
 
 
 
 
+let result = design tree2
 
-
-
-
-
-
-
+printfn "%A" result
