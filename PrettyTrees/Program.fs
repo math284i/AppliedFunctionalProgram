@@ -4,10 +4,10 @@ printfn "Hello from F#"
 type Tree<'a> =
     | Node of 'a * Tree<'a> list
 
+type Extent = (float*float) list
+
 let moveTree (Node((label, x), subtrees) : Tree<'a * float>) (x' : float) : Tree<'a * float> =
     Node((label, x + x'), subtrees)
-    
-type Extent = (float*float) list
 
 let moveExtent (e : Extent) (x : float) : Extent = 
     List.map(fun (p,q) -> (p+x,q+x)) e
@@ -26,7 +26,7 @@ let rmax (p : float) (q : float) : float =
     if p > q then p else q
 
 
-let rec fit (ps : (float * float) list) (qs : (float * float) list) : float =
+let rec fit (ps : Extent) (qs : Extent) : float =
     match (ps, qs) with
     | ((_, p)::ps', (q, _)::qs') -> rmax (fit ps' qs')  (p - q + 1.0)
     | _ -> 0.0
