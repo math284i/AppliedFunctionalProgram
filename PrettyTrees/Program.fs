@@ -9,7 +9,8 @@ let moveTree (Node((label, x), subtrees) : Tree<'a * float>) (x' : float) : Tree
     
 type Extent = (float*float) list
 
-let moveExtent (e : Extent, x) = List.map(fun (p,q) -> (p+x,q+x)) e
+let moveExtent (e : Extent) (x : float) : Extent = 
+    List.map(fun (p,q) -> (p+x,q+x)) e
 
 let rec merge (ps: Extent) (qs : Extent) : Extent =
     match (ps, qs) with
@@ -37,7 +38,7 @@ let fitlistl (es : Extent list) =
         | [] -> []
         | e::es' ->
             let x = fit acc e
-            x :: fitlistl' (merge acc (moveExtent (e, x))) es'
+            x :: fitlistl' (merge acc (moveExtent e x)) es'
     fitlistl' [] es
 
 let fitlistr (es : Extent list) =
@@ -47,7 +48,7 @@ let fitlistr (es : Extent list) =
         | e::es' ->
             let x = -(fit e acc)
             in
-                x :: fitlistr' (merge (moveExtent (e, x)) acc) es'
+                x :: fitlistr' (merge (moveExtent e x) acc) es'
     in
         List.rev (fitlistr' [] (List.rev es))
 
@@ -60,7 +61,7 @@ let design tree =
         let trees, extents = List.unzip (List.map design' subtrees)
         let positions = fitlist extents
         let ptrees = List.map2 moveTree trees positions
-        let pextents = List.map moveExtent (List.zip extents positions)
+        let pextents = List.map2 moveExtent extents positions
         let resultextent = (0.0, 0.0) :: mergeList pextents
         let resulttree = Node((label, 0.0), ptrees)
         (resulttree, resultextent)
