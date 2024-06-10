@@ -94,3 +94,19 @@ let tree2 = Node((1, 0.0), [
 let result = design tree2
 
 printfn "%A" result
+
+open FsCheck
+
+let checkPositions (Node(_, subtrees)) = 
+    let positions = subtrees |> List.map (fun (Node((_, pos), _)) -> pos)
+    let rec check_positions = function
+        | [] | [_] -> true
+        | pos1::pos2::rest -> pos1 + 1.0 <= pos2 && check_positions (pos2::rest)
+    check_positions positions
+
+let ``Nodes should be at least one unit apart`` tree =
+    let newTree = design tree
+    checkPositions newTree
+
+
+let _ = Check.Quick ``Nodes should be at least one unit apart``
