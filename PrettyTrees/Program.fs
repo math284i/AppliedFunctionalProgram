@@ -93,7 +93,7 @@ let tree2 = Node((1, 0.0), [
 
 let result = design tree2
 
-printfn "%A" result
+//printfn "%A" result
 
 open FsCheck
 
@@ -121,9 +121,22 @@ let ``Nodes should be at least one unit apart`` tree =
     let newTree = design tree
     checkPositions newTree
 
-let _ = Check.Quick ``Nodes should be at least one unit apart``
+//let _ = Check.Quick ``Nodes should be at least one unit apart``
 
+let ``Parent should be centered above its children`` tree =
+    let designedTree = design tree
+    let rec test tree =
+        match tree with
+        | Node (_, [])      -> true
+        | Node((_, pos), subtrees) ->
+            let childPositions = subtrees |> List.map (fun (Node((_, p), _)) -> p)
+            let minPos = List.min childPositions
+            let maxPos = List.max childPositions
+            let mean = mean (minPos + pos, maxPos + pos)
+            mean = pos && List.forall test subtrees
+    test designedTree
 
+let _ = Check.Quick ``Parent should be centered above its children``
 
 
 
