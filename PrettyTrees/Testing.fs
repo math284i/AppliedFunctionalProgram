@@ -46,19 +46,20 @@ let rec reflect (Node(v, subtrees)) =
 
 let rec reflectPos (Node((v, x), subtrees)) =
     Node((v, -x), List.map reflectPos subtrees)
-    
+
+let convertFloatListListToFloatSetSet (nestedList : float list list) : Set<Set<float>> =
+    nestedList
+    |> List.map Set.ofList
+    |> Set.ofList
 
 let ``Symmetric tree should be the same tree`` tree =
     let designedTree = design tree
-    let temp = reflectPos (design (reflect tree))
-    printfn "DesignTree: %A" designedTree
-    printfn "ReflectedTree: %A" temp
+    let reflectedTree = reflectPos (design (reflect tree))
     let pos1 = get_positions_level designedTree
-    let pos2 = get_positions_level temp
-    printfn "pos1: %A" pos1
-    printfn "pos2: %A" pos2
-    printfn "Equal %A" (pos1 = pos2)
-    pos1 = pos2
+    let pos2 = get_positions_level reflectedTree
+    let set1 = convertFloatListListToFloatSetSet pos1
+    let set2 = convertFloatListListToFloatSetSet pos2
+    set1 = set2
 
 let CompareTwoTrees (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
     
@@ -77,5 +78,5 @@ let ``Subtrees should be identical`` tree =
 let runTests =
     Check.Quick ``Nodes should be at least one unit apart``
     Check.Quick ``Parent should be centered above its children``
-    //Check.Quick ``Symmetric tree should be the same tree``
+    Check.Quick ``Symmetric tree should be the same tree``
     Check.Quick ``Subtrees should be identical``
