@@ -1,5 +1,5 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
-printfn "Hello from F#"
+// module Program
 
 type Tree<'a> =
     | Node of 'a * Tree<'a> list
