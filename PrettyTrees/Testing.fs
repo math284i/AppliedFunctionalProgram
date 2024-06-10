@@ -10,7 +10,6 @@ let rec get_positions_level (Node(_, subtrees)) =
         let next_levels = subtrees |> List.collect get_positions_level
         current_level :: next_levels
 
-// Check that nodes are at least one unit apart on each level
 let checkPositions tree =
     let positions_by_level = get_positions_level tree
     let rec check_positions = function
@@ -65,8 +64,9 @@ let CompareTwoTrees (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
     
     let rec test (Node((label1, pos), children1)) (Node(_, children2)) =
         match children1, children2 with
-        | _, []     -> true
-        | [], _     -> true
+        | [], []    -> true
+        | _, []     -> false
+        | [], _     -> false
         | _         -> tree1 = (design tree2) && List.forall2 test children1 children2
     test tree1 tree2
 
