@@ -1,6 +1,4 @@
-﻿// For more information see https://aka.ms/fsharp-console-apps
-// module Program
-
+﻿module GenerateDesignTree
 type Tree<'a> =
     | Node of 'a * Tree<'a> list
 
@@ -93,4 +91,8 @@ let tree2 = Node((1, 0.0), [
 
 let result = design tree2
 
-printfn "%A" result
+//printfn "%A" result
+
+
+
+

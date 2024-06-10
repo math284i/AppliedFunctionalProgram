@@ -6,11 +6,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="GenerateDesignTree.fs" />
         <Compile Include="Visuals.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="Testing.fs" />
+        <Compile Include="program.fs" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="FsCheck" Version="3.0.0-rc3" />
       <PackageReference Include="SharpVG" Version="0.0.19" />
     </ItemGroup>
 
