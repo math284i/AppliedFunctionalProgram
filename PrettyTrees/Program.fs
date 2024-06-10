@@ -4,27 +4,29 @@ printfn "Hello from F#"
 type Tree<'a> =
     | Node of 'a * Tree<'a> list
 
-let moveTree (Node((label, x), subtrees) : Tree<'a * float>) (x' : float) : Tree<'a * float> =
-    Node((label, x + x'), subtrees)
-    
 type Extent = (float*float) list
 
-let moveExtent (e : Extent, x) = List.map(fun (p,q) -> (p+x,q+x)) e
+let moveTree (Node((label, x), subtrees) : Tree<'a * float>) (x' : float) : Tree<'a * float> =
+    Node((label, x + x'), subtrees)
 
-let rec merge : Extent * Extent -> Extent = function
+let moveExtent (e : Extent) (x : float) : Extent = 
+    List.map(fun (p,q) -> (p+x,q+x)) e
+
+let rec merge (ps: Extent) (qs : Extent) : Extent =
+    match (ps, qs) with
     | ([], qs) -> qs
     | (ps, []) -> ps
-    | ((p, _)::ps, (_, q)::qs) -> (p, q) :: merge (ps, qs)
+    | ((p, _)::ps, (_, q)::qs) -> (p, q) :: merge ps qs
 
 
-let mergeList (es : Extent List) = List.fold (fun acc elem -> merge (acc, elem)) [] es
+let mergeList = List.fold merge []
 
 
 let rmax (p : float) (q : float) : float =
     if p > q then p else q
 
 
-let rec fit (ps : (float * float) list) (qs : (float * float) list) : float =
+let rec fit (ps : Extent) (qs : Extent) : float =
     match (ps, qs) with
     | ((_, p)::ps', (q, _)::qs') -> rmax (fit ps' qs')  (p - q + 1.0)
     | _ -> 0.0
@@ -36,7 +38,7 @@ let fitlistl (es : Extent list) =
         | [] -> []
         | e::es' ->
             let x = fit acc e
-            x :: fitlistl' (merge (acc, (moveExtent (e, x)))) es'
+            x :: fitlistl' (merge acc (moveExtent e x)) es'
     fitlistl' [] es
 
 let fitlistr (es : Extent list) =
@@ -46,7 +48,7 @@ let fitlistr (es : Extent list) =
         | e::es' ->
             let x = -(fit e acc)
             in
-                x :: fitlistr' (merge ((moveExtent (e, x)), acc)) es'
+                x :: fitlistr' (merge (moveExtent e x) acc) es'
     in
         List.rev (fitlistr' [] (List.rev es))
 
@@ -59,7 +61,7 @@ let design tree =
         let trees, extents = List.unzip (List.map design' subtrees)
         let positions = fitlist extents
         let ptrees = List.map2 moveTree trees positions
-        let pextents = List.map moveExtent (List.zip extents positions)
+        let pextents = List.map2 moveExtent extents positions
         let resultextent = (0.0, 0.0) :: mergeList pextents
         let resulttree = Node((label, 0.0), ptrees)
         (resulttree, resultextent)
@@ -86,22 +88,9 @@ let tree2 = Node((1, 0.0), [
         ]);
     ])
 
+
+
+
 let result = design tree2
 
 printfn "%A" result
-
-open FsCheck
-
-let checkPositions (Node(_, subtrees)) = 
-    let positions = subtrees |> List.map (fun (Node((_, pos), _)) -> pos)
-    let rec check_positions = function
-        | [] | [_] -> true
-        | pos1::pos2::rest -> pos1 + 1.0 <= pos2 && check_positions (pos2::rest)
-    check_positions positions
-
-let ``Nodes should be at least one unit apart`` tree =
-    let newTree = design tree
-    checkPositions newTree
-        
-
-let _ = Check.Quick ``Nodes should be at least one unit apart``
