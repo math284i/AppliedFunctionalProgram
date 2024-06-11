@@ -7,12 +7,15 @@
 
     <ItemGroup>
         <Compile Include="GenerateDesignTree.fs" />
+        <Compile Include="Render.fs" />
+        <Compile Include="Arrange.fs" />
         <Compile Include="Testing.fs" />
         <Compile Include="program.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="FsCheck" Version="3.0.0-rc3" />
+      <PackageReference Include="SharpVG" Version="0.0.19" />
     </ItemGroup>
 
 </Project>
