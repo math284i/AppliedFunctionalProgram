@@ -16,7 +16,7 @@ let textBGStyle = Style.createWithFill black
 
 let makeLabelText (x,y) (text : string) = 
   Text.create (Point.ofFloats (x, y + 7.0)) text
-  |> Text.withFontFamily "monospace"
+  |> Text.withFontFamily "Courier New"
   |> Text.withFontSize 20
   |> Text.withAnchor Middle
   |> Element.createWithStyle textStyle
@@ -25,7 +25,7 @@ let makeLabelText (x,y) (text : string) =
 let labelSize (text : string) =
   let charWidth = 12.0
   let width = (float text.Length) * charWidth + charWidth
-  let height = 26.0
+  let height = 26.0 //12 is actual height and then 7 is added to the top and bottom to 
   (width, height)
 
 let makeLabelBackground (x : float, y : float) (text : string) =
