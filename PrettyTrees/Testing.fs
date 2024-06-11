@@ -1,4 +1,5 @@
 module Testing
+open FsCheck.FSharp
 open GenerateDesignTree
 open FsCheck
 
@@ -49,12 +50,13 @@ let CompareTwoTreesLabels (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
         | [], _         -> false
         | _             -> label1 = label2 && List.forall2 test children1 children2
     test tree1 tree2
-    
+
+let GetSubTree (Node(_, subTree)) = subTree    
     
 //Property 1    
 let ``Nodes should be at least one unit apart`` tree =
     let designedTree = design tree
-    checkPositions designedTree    
+    checkPositions designedTree |> Prop.trivial ((GetSubTree tree).Length < 2)
    
 //Property 2   
 let ``Parent should be centered above its children`` tree =
@@ -68,12 +70,16 @@ let ``Parent should be centered above its children`` tree =
             let maxPos = List.max childPositions
             let mean = mean (minPos + pos, maxPos + pos)
             mean = pos && List.forall test subtrees
-    test designedTree   
+    test designedTree
+    |> Prop.trivial ((GetSubTree designedTree).Length = 0)
     
 //Property 3    
 let ``Symmetric tree should be the same tree`` tree =
     let designedTree = design tree
     let reflectedTree = reflectPos (design (reflect tree))
+    //let reflectedTree = reflect (reflectPos (design tree))
+    //printfn "Designed: %A" designedTree
+    //printfn "Reflected %A" reflectedTree
     let pos1 = get_positions_level designedTree
     let pos2 = get_positions_level reflectedTree
     let set1 = convertFloatListListToFloatSetSet pos1
@@ -83,7 +89,7 @@ let ``Symmetric tree should be the same tree`` tree =
 //Property 4        
 let ``Subtrees should be identical`` tree =
     let designedTree = design tree
-    CompareTwoTreesSubTree designedTree tree    
+    CompareTwoTreesSubTree designedTree tree |> Prop.trivial ((GetSubTree tree).Length = 0)
 
 //Property 5    
 let ``Labels should stay the same after design`` tree =
