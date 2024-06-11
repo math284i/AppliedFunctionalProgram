@@ -9,6 +9,7 @@ let white = Color.ofName White
 
 // Defining the styles
 let lineStyle = Style.createWithPen Pen.black
+                |> Style.withStrokeWidth (Length.ofInt 2)
 let textStyle = Style.createWithFill white
 let textBGStyle = Style.createWithFill black
 

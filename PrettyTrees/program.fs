@@ -10,7 +10,16 @@ let tree1 =
     Node(1, [
         Node(2, [])
         Node(3, [
-            Node(7, [])
+            Node(7, [
+                Node(12, [])
+                Node(674, [])
+                Node(324, [
+                    Node(22, [])
+                    Node(23, [])
+                ])
+                Node(94, [])
+                Node(234, [])
+            ])
             Node(8, [])
             Node(9, [])
         ]);
