@@ -10,7 +10,6 @@ let rec get_positions_level (Node(_, subtrees)) =
         let next_levels = subtrees |> List.collect get_positions_level
         current_level :: next_levels
 
-// Check that nodes are at least one unit apart on each level
 let checkPositions tree =
     let positions_by_level = get_positions_level tree
     let rec check_positions = function
@@ -23,8 +22,8 @@ let checkPositions tree =
     check_positions positions_by_level
 
 let ``Nodes should be at least one unit apart`` tree =
-    let newTree = design tree
-    checkPositions newTree
+    let designedTree = design tree
+    checkPositions designedTree
 
 //let _ = Check.Quick ``Nodes should be at least one unit apart``
 
@@ -42,7 +41,42 @@ let ``Parent should be centered above its children`` tree =
     test designedTree
 
 //let _ = Check.Quick ``Parent should be centered above its children``
+let rec reflect (Node(v, subtrees)) =
+    Node(v, List.map reflect (List.rev subtrees))
 
+let rec reflectPos (Node((v, x), subtrees)) =
+    Node((v, -x), List.map reflectPos subtrees)
+
+let convertFloatListListToFloatSetSet (nestedList : float list list) : Set<Set<float>> =
+    nestedList
+    |> List.map Set.ofList
+    |> Set.ofList
+
+let ``Symmetric tree should be the same tree`` tree =
+    let designedTree = design tree
+    let reflectedTree = reflectPos (design (reflect tree))
+    let pos1 = get_positions_level designedTree
+    let pos2 = get_positions_level reflectedTree
+    let set1 = convertFloatListListToFloatSetSet pos1
+    let set2 = convertFloatListListToFloatSetSet pos2
+    set1 = set2
+
+let CompareTwoTrees (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
+    
+    let rec test (Node((label1, pos), children1)) (Node(_, children2)) =
+        match children1, children2 with
+        | [], []    -> true
+        | _, []     -> false
+        | [], _     -> false
+        | _         -> tree1 = (design tree2) && List.forall2 test children1 children2
+    test tree1 tree2
+
+let ``Subtrees should be identical`` tree =
+    let designedTree = design tree
+    CompareTwoTrees designedTree tree
+    
 let runTests =
     Check.Quick ``Nodes should be at least one unit apart``
     Check.Quick ``Parent should be centered above its children``
+    Check.Quick ``Symmetric tree should be the same tree``
+    Check.Quick ``Subtrees should be identical``
