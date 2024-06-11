@@ -64,35 +64,3 @@ let design tree =
         let resulttree = Node((label, 0.0), ptrees)
         (resulttree, resultextent)
     fst (design' tree)
-
-
-let tree = Node((1, 0.0), [
-        Node((2, 0.0), []);
-        Node((3, 0.0), []);
-        Node((6, 0.0), []);
-    ])
-
-let tree2 = Node((1, 0.0), [
-        Node((2, 0.0), []);
-        Node((3, 0.0), [
-            Node((7, 0.0), []);
-            Node((8, 0.0), []);
-            Node((9, 0.0), []);
-        ]);
-        Node((6, 0.0), [
-            Node((7, 0.0), []);
-            Node((8, 0.0), []);
-            Node((9, 0.0), []);
-        ]);
-    ])
-
-
-
-
-let result = design tree2
-
-//printfn "%A" result
-
-
-
-
