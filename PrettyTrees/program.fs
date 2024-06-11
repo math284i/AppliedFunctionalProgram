@@ -2,9 +2,8 @@
 
 open GenerateDesignTree
 open Testing
-open Visuals
-
-
+open Arrange
+open Render
 
 let tree1 = 
     Node(1, [
@@ -46,14 +45,25 @@ let tree2 =
                 Node("eighty-three", [
                     Node("eighty-five", [])
                     Node("eighty-six", [])
-                    Node("eighty-seven", [])
+                    Node("eighty-seven", [
+                        
+                        Node("324", [
+                            Node("22", [])
+                            Node("23", [])
+                        ])
+                        Node("12", [])
+                        Node("674", [])
+                    ])
                 ])
             ]);
             Node("nine", []);
         ]);
         Node("six", [
             Node("seven", [
-                Node("seventy-seven", []);
+                Node("seventy-seven", [
+                    Node("94", [])
+                    Node("234", [])
+                ]);
             ]);
             Node("eight", []);
             Node("nine", [
@@ -68,5 +78,5 @@ let tree2 =
 [<EntryPoint>]
 let main argv =
     runTests
-    storeFile "tree.html" tree1
+    design tree2 |> arrangeTree |> storeHtml "tree.html"
     0 // return an integer exit code
