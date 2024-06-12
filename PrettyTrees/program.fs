@@ -70,7 +70,7 @@ let tree2 =
                 Node("eleven", []);
                 Node("twenty-two", []);
                 Node("ninety-seven", []);
-                Node("forty-two", []);
+                Node("one-hundred-and-forty-two", []);
             ]);
         ]);
     ])
@@ -78,5 +78,6 @@ let tree2 =
 [<EntryPoint>]
 let main argv =
     runTests
-    design tree2 |> arrangeTree |> storeHtml "tree.html"
+    design tree2 |> arrangeTree |> storeSvg "tree.svg"
+
     0 // return an integer exit code

@@ -58,16 +58,33 @@ let makeLabelElements tree =
 let makeElements arrangedTree =
     makeLineElements arrangedTree @ makeLabelElements arrangedTree
 
-let makeSvg (arrangedTree, size) =
-  arrangedTree
-  |> makeElements
-  |> Svg.ofList
-  |> Svg.withSize (Area.ofFloats size)
+// Finds the maximum and minimum x and y values of the tree
+// The values are used to generate a viewbox
+let private makeViewBox arrangedTree : ViewBox =
+    let rec minMax (xMin, yMin, xMax, yMax) (Node((label, (x,y)), subtrees)) =
+        let (w,h) = labelSize (string label)
+        
+        let acc = (
+            min xMin (x - w/2.0),
+            min yMin (y - h/2.0),
+            max xMax (x + w/2.0),
+            max yMax (y + h/2.0)
+        )
+        List.fold minMax acc subtrees
 
-let makeHtml (arrangedTree, size) =
-  let svg = makeSvg (arrangedTree, size)
-  svg |> Svg.toHtml "Tree"
+    let (xMin, yMin, xMax, yMax) = minMax (0, 0, 0, 0) arrangedTree
 
-let storeHtml filePath (arrangedTree, size) =
-  let html = makeHtml (arrangedTree, size)
-  System.IO.File.WriteAllText(filePath, html)
+    { Minimum = Point.ofFloats (xMin, yMin)
+      Size = Area.ofFloats (xMax - xMin, yMax - yMin) }
+
+let makeSvg arrangedTree =
+    let viewBox = makeViewBox arrangedTree
+    arrangedTree
+    |> makeElements
+    |> Svg.ofList
+    |> Svg.withViewBox viewBox
+    |> Svg.withSize viewBox.Size
+    |> Svg.toString
+
+let storeSvg filePath arrangedTree =
+    System.IO.File.WriteAllText(filePath, makeSvg arrangedTree)
