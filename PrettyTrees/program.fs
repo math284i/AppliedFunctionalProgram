@@ -2,7 +2,6 @@
 
 open GenerateDesignTree
 open Testing
-open Arrange
 open Render
 
 let tree1 = 
@@ -78,6 +77,6 @@ let tree2 =
 [<EntryPoint>]
 let main argv =
     runTests
-    design tree2 |> arrangeTree |> storeSvg "tree.svg"
+    design tree2 |> renderTree "tree.svg"
 
     0 // return an integer exit code
