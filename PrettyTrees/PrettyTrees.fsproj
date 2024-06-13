@@ -8,7 +8,6 @@
     <ItemGroup>
         <Compile Include="GenerateDesignTree.fs" />
         <Compile Include="Render.fs" />
-        <Compile Include="Arrange.fs" />
         <Compile Include="Testing.fs" />
         <Compile Include="program.fs" />
     </ItemGroup>

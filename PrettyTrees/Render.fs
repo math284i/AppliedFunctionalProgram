@@ -5,6 +5,45 @@ open GenerateDesignTree
 
 // Holds the (x, y), (w, h) of a rectangle
 type RectBox = (float * float) * (float * float)
+type ArrangedTree = Tree<string * (float * float)>
+
+
+// Calculate the size of a label
+let labelSize (text : string) =
+    let charWidth = 12.0
+    let width = (float text.Length) * charWidth + charWidth
+    let height = 26.0
+    (width, height)
+
+
+// --- Arranging the tree ---
+
+// Convert to ArrangedTree
+// - labels are converted to string
+// - absolute coordinates are calculated using pos and depth
+let rec private convert (parentPos : float) (depth : float) (Node((label, pos), subtrees) : Tree<'a * float>) : ArrangedTree =
+    let x = parentPos + pos
+    let subtrees' = List.map (convert x (depth + 1.0)) subtrees
+    Node((string label, (x, depth)), subtrees')
+
+let private maxRect (w1, h1) (w2, h2) =
+    (max w1 w2, max h1 h2)
+
+let rec private getMaxLabelSize (Node((label, _), subtrees) : ArrangedTree) : float * float =
+    List.map getMaxLabelSize subtrees |> List.fold maxRect (labelSize label)
+
+let rec private scaleTree ((fx : float, fy : float) as factor) (Node((label, (x, y)), subtrees) : ArrangedTree) =
+    Node((label, (x * fx, y * fy)), List.map (scaleTree factor) subtrees)
+
+let private scale (tree : ArrangedTree) : ArrangedTree =
+    let factor = (getMaxLabelSize tree |> maxRect (100.0, 100.0))
+    scaleTree factor tree
+
+let arrangeTree (tree : Tree<'a * float>) =
+    tree |> convert 0 0 |> scale
+
+
+// --- Visualizing the tree ---
 
 // Defining the colors
 let black = Color.ofName Black
@@ -14,13 +53,6 @@ let white = Color.ofName White
 let lineStyle    = Style.createWithStroke black |> Style.withStrokeWidth (Length.ofInt 2)
 let textStyle    = Style.createWithFill white
 let textBoxStyle = Style.createWithFill black
-
-let labelSize (text : string) =
-    let charWidth = 12.0
-    let width = (float text.Length) * charWidth + charWidth
-    let height = 26.0
-    (width, height)
-
 
 let private makeLine a b =
     Line.create (Point.ofFloats a) (Point.ofFloats b)
@@ -88,5 +120,10 @@ let makeSvg tree =
     |> Svg.withSize viewBox.Size
     |> Svg.toString
 
-let storeSvg filePath arrangedTree =
+// --- Storing the SVG ---
+
+let private storeSvg filePath arrangedTree =
     System.IO.File.WriteAllText(filePath, makeSvg arrangedTree)
+
+let renderTree filePath designedTree =
+    designedTree |> arrangeTree |> storeSvg filePath

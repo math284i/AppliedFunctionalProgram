@@ -102,6 +102,18 @@ let ``Design tree should be deterministic`` tree =
     let designedTree2 = design tree
     designedTree1 = designedTree2
     
+//Property 7
+let ``Design won't affect length of tree list's`` tree =
+    let designedTree = design tree
+    let rec test tree1 tree2 =
+        let children1 = GetSubTree tree1
+        let children2 = GetSubTree tree2
+        match children1, children2 with
+        | [], []        -> true
+        | _, []         -> false
+        | [], _         -> false
+        | _             -> children1.Length = children2.Length && List.forall2 test children1 children2
+    test designedTree tree
     
 let runTests =
     Check.Quick ``Nodes should be at least one unit apart``
@@ -110,3 +122,4 @@ let runTests =
     Check.Quick ``Subtrees should be identical``
     Check.Quick ``Labels should stay the same after design``
     Check.Quick ``Design tree should be deterministic``
+    Check.Quick ``Design won't affect length of tree list's``
