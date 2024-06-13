@@ -73,7 +73,7 @@ let private makeText (label, (x,y)) =
 
 let private makeLines (Node((_, coords), subtrees)) =
     let rec makeLines' acc p1 subtrees =
-        let folder = fun acc (Node((_, p2), subtrees')) ->
+        let folder acc (Node((_, p2), subtrees')) =
             let newLine = makeLine p1 p2
             makeLines' (newLine :: acc) p2 subtrees'
         List.fold folder acc subtrees
