@@ -58,8 +58,7 @@ let compareTwoTreesLabels (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
 let ``Nodes should be at least one unit apart`` tree =
     let designedTree = design tree
     checkPositions designedTree
-    |> Prop.trivial ((getSubTree tree).Length = 0) 
-    |> Prop.classify (List.forall (fun (x:float list) -> x.Length < 2) (getPositionsLevel designedTree)) "Single element per level"
+    |> Prop.trivial (List.forall (fun (x:float list) -> x.Length < 2) (getPositionsLevel designedTree))
    
 //Property 2   
 let ``Parent should be centered above its children`` tree =
