@@ -32,12 +32,13 @@ let private maxRect (w1, h1) (w2, h2) =
 let rec private getMaxLabelSize (Node((label, _), subtrees) : ArrangedTree) : float * float =
     List.map getMaxLabelSize subtrees |> List.fold maxRect (labelSize label)
 
-let rec private scaleTree ((fx : float, fy : float) as factor) (Node((label, (x, y)), subtrees) : ArrangedTree) =
-    Node((label, (x * fx, y * fy)), List.map (scaleTree factor) subtrees)
+let rec private scaleTree ((fx : float, fy : float) as factors) (Node((label, (x, y)), subtrees) : ArrangedTree) =
+    Node((label, (x * fx, y * fy)), List.map (scaleTree factors) subtrees)
 
 let private scale (tree : ArrangedTree) : ArrangedTree =
-    let factor = (getMaxLabelSize tree |> maxRect (100.0, 100.0))
-    scaleTree factor tree
+    let (w, h) = getMaxLabelSize tree
+    let factors = (w + 5.0, h + 26.0)
+    scaleTree factors tree
 
 let arrangeTree (tree : Tree<'a * float>) =
     tree |> convert 0 0 |> scale
@@ -69,7 +70,6 @@ let private makeText (label, (x,y)) =
     |> Text.withFont "Andale Mono, monospace" 20
     |> Text.withAnchor Middle
     |> Element.createWithStyle textStyle
-
 
 let private makeLines (Node((_, coords), subtrees)) =
     let rec makeLines' acc p1 subtrees =
