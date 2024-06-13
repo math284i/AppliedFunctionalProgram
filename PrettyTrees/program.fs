@@ -76,7 +76,7 @@ let tree2 =
 
 [<EntryPoint>]
 let main argv =
-    runTests
+    //runTests
     design tree2 |> renderTree "tree.svg"
 
     0 // return an integer exit code
