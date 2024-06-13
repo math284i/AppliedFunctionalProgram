@@ -41,8 +41,7 @@ let fitlistr (es : Extent list) =
         | [] -> []
         | e::es' ->
             let x = -(fit e acc)
-            in
-                x :: fitlistr' (merge (moveExtent e x) acc) es'
+            x :: fitlistr' (merge (moveExtent e x) acc) es'
     in
         List.rev (fitlistr' [] (List.rev es))
 
