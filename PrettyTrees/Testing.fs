@@ -28,11 +28,6 @@ let rec reflect (Node(v, subtrees)) =
 let rec reflectPos (Node((v, x), subtrees)) =
     Node((v, -x), List.map reflectPos subtrees)
 
-let convertFloatListListToFloatSetSet (nestedList : float list list) : Set<Set<float>> =
-    nestedList
-    |> List.map Set.ofList
-    |> Set.ofList
-
 let CompareTwoTreesSubTree (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
     let rec test (Node((label1, pos), children1)) (Node(_, children2)) =
         match children1, children2 with
@@ -56,7 +51,9 @@ let GetSubTree (Node(_, subTree)) = subTree
 //Property 1    
 let ``Nodes should be at least one unit apart`` tree =
     let designedTree = design tree
-    checkPositions designedTree |> Prop.trivial ((GetSubTree tree).Length < 2)
+    checkPositions designedTree
+    |> Prop.trivial ((GetSubTree tree).Length = 0)
+    |> Prop.classify (List.forall (fun (x : float list) -> x.Length < 2) (get_positions_level designedTree)) "Single element per level"
    
 //Property 2   
 let ``Parent should be centered above its children`` tree =
@@ -76,15 +73,11 @@ let ``Parent should be centered above its children`` tree =
 //Property 3    
 let ``Symmetric tree should be the same tree`` tree =
     let designedTree = design tree
-    let reflectedTree = reflectPos (design (reflect tree))
-    //let reflectedTree = reflect (reflectPos (design tree))
-    //printfn "Designed: %A" designedTree
-    //printfn "Reflected %A" reflectedTree
+    let reflectedTree = reflect (reflectPos (design (reflect tree)))
     let pos1 = get_positions_level designedTree
     let pos2 = get_positions_level reflectedTree
-    let set1 = convertFloatListListToFloatSetSet pos1
-    let set2 = convertFloatListListToFloatSetSet pos2
-    set1 = set2    
+    pos1 = pos2
+    |> Prop.trivial ((GetSubTree designedTree).Length < 2)
     
 //Property 4        
 let ``Subtrees should be identical`` tree =
@@ -95,6 +88,7 @@ let ``Subtrees should be identical`` tree =
 let ``Labels should stay the same after design`` tree =
     let designedTree = design tree
     CompareTwoTreesLabels designedTree tree
+    
     
 //Property 6    
 let ``Design tree should be deterministic`` tree =
