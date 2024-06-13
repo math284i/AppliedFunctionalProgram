@@ -3,16 +3,16 @@ open FsCheck.FSharp
 open GenerateDesignTree
 open FsCheck
 
-let rec get_positions_level (Node(_, subtrees)) =
+let rec getPositionsLevel (Node(_, subtrees)) =
     match subtrees with
     | [] -> [[]]
     | _ ->
         let current_level = subtrees |> List.map (fun (Node((_, pos), _)) -> pos)
-        let next_levels = subtrees |> List.collect get_positions_level
+        let next_levels = subtrees |> List.collect getPositionsLevel
         current_level :: next_levels
 
 let checkPositions tree =
-    let positions_by_level = get_positions_level tree
+    let positions_by_level = getPositionsLevel tree
     let rec check_positions = function
         | [] -> true
         | level::rest ->
@@ -28,23 +28,23 @@ let rec reflect (Node(v, subtrees)) =
 let rec reflectPos (Node((v, x), subtrees)) =
     Node((v, -x), List.map reflectPos subtrees)
 
-let GetSubTree (Node(_, subTree)) = subTree
+let getSubTree (Node(_, subTree)) = subTree
 
-let CompareTwoTreesSubTree (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
+let compareTwoTreesSubTree (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
     let rec test subTree1 subTree2 =
-        let children1 = GetSubTree subTree1
-        let children2 = GetSubTree subTree2
+        let children1 = getSubTree subTree1
+        let children2 = getSubTree subTree2
         match children1, children2 with
         | [], []    -> true
         | _, []     -> false
         | [], _     -> false
         | _         ->
             let designed = design subTree2
-            let newChildren = GetSubTree designed
+            let newChildren = getSubTree designed
             children1 = newChildren && List.forall2 test children1 children2
     test tree1 tree2
 
-let CompareTwoTreesLabels (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
+let compareTwoTreesLabels (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
     let rec test (Node((label1, pos), children1)) (Node((label2), children2)) =
         match children1, children2 with
         | [], []        -> true
@@ -58,8 +58,8 @@ let CompareTwoTreesLabels (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
 let ``Nodes should be at least one unit apart`` tree =
     let designedTree = design tree
     checkPositions designedTree
-    |> Prop.trivial ((GetSubTree tree).Length = 0) 
-    |> Prop.classify (List.forall (fun (x:float list) -> x.Length < 2) (get_positions_level designedTree)) "Single element per level"
+    |> Prop.trivial ((getSubTree tree).Length = 0) 
+    |> Prop.classify (List.forall (fun (x:float list) -> x.Length < 2) (getPositionsLevel designedTree)) "Single element per level"
    
 //Property 2   
 let ``Parent should be centered above its children`` tree =
@@ -74,28 +74,28 @@ let ``Parent should be centered above its children`` tree =
             let mean = mean (minPos + pos, maxPos + pos)
             mean = pos && List.forall test subtrees
     test designedTree
-    |> Prop.trivial ((GetSubTree designedTree).Length = 0)
+    |> Prop.trivial ((getSubTree designedTree).Length = 0)
     
 //Property 3    
 let ``Symmetric tree should be the same tree`` tree =
     let designedTree = design tree
     let reflectedTree = reflect (reflectPos (design (reflect tree)))
-    let pos1 = get_positions_level designedTree
-    let pos2 = get_positions_level reflectedTree
+    let pos1 = getPositionsLevel designedTree
+    let pos2 = getPositionsLevel reflectedTree
     pos1 = pos2
-    |> Prop.trivial ((GetSubTree designedTree).Length = 0)
-    |> Prop.classify (List.forall (fun (x:float list) -> x.Length < 2) (get_positions_level designedTree)) "Single element per level"
+    |> Prop.trivial ((getSubTree designedTree).Length = 0)
+    |> Prop.classify (List.forall (fun (x:float list) -> x.Length < 2) (getPositionsLevel designedTree)) "Single element per level"
     
 //Property 4        
 let ``Subtrees should be identical`` tree =
     let designedTree = design tree
-    CompareTwoTreesSubTree designedTree tree
-    |> Prop.trivial ((GetSubTree tree).Length = 0)
+    compareTwoTreesSubTree designedTree tree
+    |> Prop.trivial ((getSubTree tree).Length = 0)
 
 //Property 5    
 let ``Labels should stay the same after design`` tree =
     let designedTree = design tree
-    CompareTwoTreesLabels designedTree tree
+    compareTwoTreesLabels designedTree tree
     
 //Property 6    
 let ``Design tree should be deterministic`` tree =
@@ -107,8 +107,8 @@ let ``Design tree should be deterministic`` tree =
 let ``Design won't affect length of tree list's`` tree =
     let designedTree = design tree
     let rec test tree1 tree2 =
-        let children1 = GetSubTree tree1
-        let children2 = GetSubTree tree2
+        let children1 = getSubTree tree1
+        let children2 = getSubTree tree2
         match children1, children2 with
         | [], []        -> true
         | _, []         -> false
