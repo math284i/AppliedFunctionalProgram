@@ -1,3 +1,8 @@
+//S204423 Anders Keller Poulsen
+//S204452 Mathias Rerup-Dyberg
+//S183879 Markus Jegstrup
+//S112506 Michael Andersen
+//Date: 13/06/2024
 module Render
 
 open SharpVG

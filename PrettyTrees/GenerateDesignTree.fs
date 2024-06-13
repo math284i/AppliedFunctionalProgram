@@ -1,4 +1,9 @@
-﻿module GenerateDesignTree
+﻿//S204423 Anders Keller Poulsen
+//S204452 Mathias Rerup-Dyberg
+//S183879 Markus Jegstrup
+//S112506 Michael Andersen
+//Date: 13/06/2024
+module GenerateDesignTree
 type Tree<'a> =
     | Node of 'a * Tree<'a> list
 

@@ -1,4 +1,9 @@
-﻿module PrettyTrees.program
+﻿//S204423 Anders Keller Poulsen
+//S204452 Mathias Rerup-Dyberg
+//S183879 Markus Jegstrup
+//S112506 Michael Andersen
+//Date: 13/06/2024
+module PrettyTrees.program
 
 open GenerateDesignTree
 open Testing
@@ -66,6 +71,8 @@ let tree2 =
             ]);
             Node("eight", []);
             Node("nine", [
+                Node("eleven", []);
+                Node("twenty-two", []);
                 Node("ninety-seven", []);
                 Node("one-hundred-and-forty-two", []);
             ]);
@@ -74,7 +81,7 @@ let tree2 =
 
 [<EntryPoint>]
 let main argv =
-    //runTests
-    design tree1 |> renderTree "tree.svg"
+    runTests
+    design tree2 |> renderTree "tree.svg"
     
     0 // return an integer exit code
