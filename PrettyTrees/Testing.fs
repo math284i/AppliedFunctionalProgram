@@ -28,13 +28,20 @@ let rec reflect (Node(v, subtrees)) =
 let rec reflectPos (Node((v, x), subtrees)) =
     Node((v, -x), List.map reflectPos subtrees)
 
+let GetSubTree (Node(_, subTree)) = subTree
+
 let CompareTwoTreesSubTree (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
-    let rec test (Node((label1, pos), children1)) (Node(_, children2)) =
+    let rec test subTree1 subTree2 =
+        let children1 = GetSubTree subTree1
+        let children2 = GetSubTree subTree2
         match children1, children2 with
         | [], []    -> true
         | _, []     -> false
         | [], _     -> false
-        | _         -> tree1 = (design tree2) && List.forall2 test children1 children2
+        | _         ->
+            let designed = design subTree2
+            let newChildren = GetSubTree designed
+            children1 = newChildren && List.forall2 test children1 children2
     test tree1 tree2
 
 let CompareTwoTreesLabels (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
@@ -46,7 +53,6 @@ let CompareTwoTreesLabels (tree1 : Tree<'a * float>) (tree2 : Tree<'a>) : bool =
         | _             -> label1 = label2 && List.forall2 test children1 children2
     test tree1 tree2
 
-let GetSubTree (Node(_, subTree)) = subTree    
     
 //Property 1    
 let ``Nodes should be at least one unit apart`` tree =
