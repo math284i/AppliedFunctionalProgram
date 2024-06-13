@@ -20,13 +20,9 @@ let rec merge (ps: Extent) (qs : Extent) : Extent =
 let mergeList = List.fold merge []
 
 
-let rmax (p : float) (q : float) : float =
-    if p > q then p else q
-
-
 let rec fit (ps : Extent) (qs : Extent) : float =
     match (ps, qs) with
-    | ((_, p)::ps', (q, _)::qs') -> rmax (fit ps' qs')  (p - q + 1.0)
+    | ((_, p)::ps', (q, _)::qs') -> max (fit ps' qs')  (p - q + 1.0)
     | _ -> 0.0
 
 
