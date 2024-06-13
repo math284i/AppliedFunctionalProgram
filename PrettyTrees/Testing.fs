@@ -56,7 +56,9 @@ let GetSubTree (Node(_, subTree)) = subTree
 //Property 1    
 let ``Nodes should be at least one unit apart`` tree =
     let designedTree = design tree
-    checkPositions designedTree |> Prop.trivial ((GetSubTree tree).Length < 2)
+    checkPositions designedTree
+    |> Prop.trivial ((GetSubTree tree).Length = 0) 
+    |> Prop.classify (List.forall (fun (x:float list) -> x.Length < 2) (get_positions_level designedTree)) "Single element per level"
    
 //Property 2   
 let ``Parent should be centered above its children`` tree =
@@ -84,12 +86,15 @@ let ``Symmetric tree should be the same tree`` tree =
     let pos2 = get_positions_level reflectedTree
     let set1 = convertFloatListListToFloatSetSet pos1
     let set2 = convertFloatListListToFloatSetSet pos2
-    set1 = set2    
+    set1 = set2
+    |> Prop.trivial ((GetSubTree designedTree).Length = 0)
+    |> Prop.classify (List.forall (fun (x:float list) -> x.Length < 2) (get_positions_level designedTree)) "Single element per level"
     
 //Property 4        
 let ``Subtrees should be identical`` tree =
     let designedTree = design tree
-    CompareTwoTreesSubTree designedTree tree |> Prop.trivial ((GetSubTree tree).Length = 0)
+    CompareTwoTreesSubTree designedTree tree
+    |> Prop.trivial ((GetSubTree tree).Length = 0)
 
 //Property 5    
 let ``Labels should stay the same after design`` tree =
