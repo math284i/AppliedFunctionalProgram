@@ -66,8 +66,6 @@ let tree2 =
             ]);
             Node("eight", []);
             Node("nine", [
-                Node("eleven", []);
-                Node("twenty-two", []);
                 Node("ninety-seven", []);
                 Node("one-hundred-and-forty-two", []);
             ]);
@@ -77,6 +75,6 @@ let tree2 =
 [<EntryPoint>]
 let main argv =
     //runTests
-    design tree2 |> renderTree "tree.svg"
+    design tree1 |> renderTree "tree.svg"
     
     0 // return an integer exit code
